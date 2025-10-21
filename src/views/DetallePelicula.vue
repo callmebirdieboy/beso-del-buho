@@ -65,15 +65,22 @@ const isSoldOut = movie.reserved >= movie.capacity
             Horario: {{ movie.datetime }}
           </p>
 
-          <button
-            class="mt-3 px-4 py-2 font-inter rounded transition"
-            :class="isSoldOut 
-              ? 'bg-dark text-textSecondary cursor-not-allowed ring-1 ring-[#2a2a2a]' 
-              : 'bg-primary text-white hover:opacity-90'"
-            :disabled="isSoldOut"
-          >
-            {{ isSoldOut ? 'Agotada' : 'Reservar' }}
-          </button>
+       <router-link
+  v-if="!isSoldOut"
+  :to="`/reserva/${movie.id}`"
+  class="mt-3 px-4 py-2 font-inter rounded bg-primary text-white hover:opacity-90 transition text-center inline-block"
+>
+  Reservar
+</router-link>
+
+<button
+  v-else
+  class="mt-3 px-4 py-2 font-inter rounded bg-dark text-textSecondary cursor-not-allowed ring-1 ring-[#2a2a2a]"
+  disabled
+>
+  Agotada
+</button>
+
         </div>
       </div>
     </main>

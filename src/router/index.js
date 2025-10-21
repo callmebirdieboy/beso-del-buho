@@ -18,7 +18,15 @@ const router = createRouter({
       component: DetallePelicula,
       props: true,
       meta: { title: 'Detalle de película | El Beso del Búho' }
-    }
+    },
+    {
+  path: '/reserva/:id',
+  name: 'reserva',
+  component: () => import('../views/SeatSelection.vue'),
+  props: true,
+  meta: { title: 'Selección de asientos | El Beso del Búho' }
+}
+
   ]
 })
 

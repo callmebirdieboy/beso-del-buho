@@ -67,15 +67,22 @@ const shareProgram = () => {
           </router-link>
           <p class="text-textSecondary font-inter text-sm">{{ f.datetime }}</p>
 
-          <button
-            class="mt-4 px-4 py-2 font-inter rounded transition"
-            :class="f.reserved >= f.capacity
-              ? 'bg-dark text-textSecondary cursor-not-allowed ring-1 ring-[#2a2a2a]'
-              : 'bg-primary text-white hover:opacity-90'"
-            :disabled="f.reserved >= f.capacity"
-          >
-            {{ f.reserved >= f.capacity ? 'Agotada' : 'Reservar' }}
-          </button>
+          <router-link
+  v-if="f.reserved < f.capacity"
+  :to="`/reserva/${f.id}`"
+  class="mt-4 px-4 py-2 font-inter rounded bg-primary text-white hover:opacity-90 transition text-center block"
+>
+  Reservar
+</router-link>
+
+<button
+  v-else
+  class="mt-4 px-4 py-2 font-inter rounded bg-dark text-textSecondary cursor-not-allowed ring-1 ring-[#2a2a2a] block"
+  disabled
+>
+  Agotada
+</button>
+
         </article>
       </div>
     </main>
