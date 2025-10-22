@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Cartelera from '../views/Cartelera.vue'
 import DetallePelicula from '../views/DetallePelicula.vue'
+import RegistroReserva from '../views/RegistroReserva.vue'
+import ConfirmacionReserva from '../views/ConfirmacionReserva.vue'
 import { functions } from '../data/functions'
 
 const router = createRouter({
@@ -25,7 +27,21 @@ const router = createRouter({
   component: () => import('../views/SeatSelection.vue'),
   props: true,
   meta: { title: 'Selección de asientos | El Beso del Búho' }
-}
+},
+{
+      path: '/registro',
+      name: 'registro',
+      component: RegistroReserva,
+      props: true,
+      meta: { title: 'Registro de reserva | El Beso del Búho' }
+    },
+    {
+      path: '/confirmacion',
+      name: 'confirmacion',
+      component: ConfirmacionReserva,
+      props: true,
+      meta: { title: 'Confirmación de reserva | El Beso del Búho' }
+    }
 
   ]
 })

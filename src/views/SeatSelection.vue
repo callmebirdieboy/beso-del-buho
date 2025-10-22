@@ -16,22 +16,57 @@ const seats = ref(
     Array.from({ length: cols }, () => (Math.random() < 0.2 ? 1 : 0))
   )
 )
+const selectedSeats = ref([]) // guardará los identificadores tipo "A1", "B3", etc.
 const selectedCount = ref(0)
+
+// Etiquetas de filas (A, B, C...)
+const rowLabels = ['A', 'B', 'C', 'D', 'E']
 
 const toggleSeat = (r, c) => {
   const current = seats.value[r][c]
-  if (current === 1) return
+  const seatId = `${rowLabels[r]}${c + 1}`
+
+  if (current === 1) return // Ocupado, no hace nada
+
   if (current === 0) {
-    seats.value[r][c] = 2
+    seats.value[r][c] = 2 // Seleccionado
+    selectedSeats.value.push(seatId)
     selectedCount.value++
   } else if (current === 2) {
-    seats.value[r][c] = 0
+    seats.value[r][c] = 0 // Des-seleccionado
+    selectedSeats.value = selectedSeats.value.filter(s => s !== seatId)
     selectedCount.value--
   }
 }
 
+// Volver a cartelera
 const goBack = () => router.push('/')
-const confirmSeats = () => alert(`Has seleccionado ${selectedCount.value} asiento(s) para "${movie.title}".`)
+
+// Confirmar selección → ir al registro
+const confirmSeats = () => {
+  if (selectedCount.value === 0) {
+    alert('Por favor selecciona al menos un asiento.')
+    return
+  }
+
+  // Obtener los asientos seleccionados (por coordenadas o número)
+  const seatsSelected = []
+  seats.value.forEach((row, r) => {
+    row.forEach((seat, c) => {
+      if (seat === 2) seatsSelected.push(`F${r + 1}A${c + 1}`)
+    })
+  })
+
+  // Redirigir al formulario con datos de la película y asientos
+  router.push({
+    name: 'registro',
+    query: {
+      movieId: movie.id,
+      selectedSeats: seatsSelected.join(', ')
+    }
+  })
+}
+
 </script>
 
 <template>
@@ -47,14 +82,14 @@ const confirmSeats = () => alert(`Has seleccionado ${selectedCount.value} asient
       {{ movie.datetime }}
     </p>
 
-    <!-- Contenedor asientos -->
+    <!-- Contenedor de asientos -->
     <div class="bg-[#1a1a1a] p-6 rounded-lg shadow-md text-center w-full max-w-md md:max-w-lg lg:max-w-xl">
       <!-- Pantalla -->
       <div class="bg-[#2A2A2A] text-textSecondary font-inter py-1 px-4 mb-6 rounded text-sm md:text-base">
         PANTALLA
       </div>
 
-      <!-- Grid -->
+      <!-- Grid de asientos -->
       <div
         class="grid gap-3 justify-center"
         :style="{ gridTemplateColumns: `repeat(${cols}, minmax(30px, 1fr))` }"
@@ -64,19 +99,22 @@ const confirmSeats = () => alert(`Has seleccionado ${selectedCount.value} asient
             v-for="(seat, c) in row"
             :key="c"
             @click="toggleSeat(r, c)"
-            class="aspect-square rounded cursor-pointer transition-all"
+            class="aspect-square rounded cursor-pointer transition-all flex items-center justify-center text-xs font-inter"
             :class="{
               'bg-[#2A2A2A] hover:opacity-80 hover:scale-110': seat === 0,
-              'bg-[#1E1E1E] cursor-not-allowed': seat === 1,
-              'bg-[#4B3F72] scale-105': seat === 2
+              'bg-[#1E1E1E] cursor-not-allowed text-[#555]': seat === 1,
+              'bg-[#4B3F72] scale-105 text-white': seat === 2
             }"
-          ></div>
+          >
+            {{ rowLabels[r] + (c + 1) }}
+          </div>
         </div>
       </div>
 
       <!-- Contador -->
       <p class="mt-6 text-sm md:text-base text-textSecondary font-inter">
-        Asientos seleccionados: <span class="text-white font-semibold">{{ selectedCount }}</span>
+        Asientos seleccionados:
+        <span class="text-white font-semibold">{{ selectedCount }}</span>
       </p>
     </div>
 
