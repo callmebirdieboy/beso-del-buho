@@ -8,6 +8,28 @@ const functions = [
   { id: 6, title: "The Smashing Machine",  datetime: "Lunes 17:00 h",    poster: "/smashing.jpg", capacity: 35, reserved: 0  },
 ];
 
+const proximosEstrenos = [
+  {
+    id: 1,
+    title: "No Other Choice",
+    poster: "/nochoice.avif",
+    release: "15 de enero"
+  },
+  {
+    id: 2,
+    title: "La Grazia",
+    poster: "/lagrazia.avif",
+    release: "Marzo 2026"
+  },
+  {
+    id: 3,
+    title: "Father Mother Sister Brother",
+    poster: "/fathermother.webp",
+    release: "Abril 2026"
+  }
+];
+
+
 // Reglas: soldout si reserved >= capacity; few si reserved >= 0.8 * capacity; disponible en otro caso
 const getStatus = (f) => {
   if (f.reserved >= f.capacity) return 'soldout';
@@ -86,6 +108,32 @@ const shareProgram = () => {
         </article>
       </div>
     </main>
+
+    <!-- Próximos estrenos -->
+<section class="px-6 py-12 bg-dark border-t border-[#1e1e1e]">
+  <h2 class="text-2xl md:text-3xl font-playfair text-center mb-8">
+    Próximos estrenos
+  </h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+    <article
+      v-for="p in proximosEstrenos"
+      :key="p.id"
+      class="bg-[#1E1E1E] rounded-lg p-4 shadow-sm ring-1 ring-[#2a2a2a] flex flex-col items-center transition-transform hover:scale-105"
+    >
+      <img
+        :src="p.poster"
+        :alt="p.title"
+        class="w-full h-72 object-cover rounded mb-4"
+      />
+      <h3 class="text-lg font-playfair text-center mb-1">{{ p.title }}</h3>
+      <p class="text-textSecondary font-inter text-sm text-center">
+        A partir del {{ p.release }}
+      </p>
+    </article>
+  </div>
+</section>
+
 
     <!-- Footer -->
     <footer class="py-4 text-center text-textSecondary text-sm border-t border-[#1e1e1e]">
