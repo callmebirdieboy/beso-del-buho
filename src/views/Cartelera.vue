@@ -1,12 +1,9 @@
 <script setup>
-const functions = [
-  { id: 1, title: "Twinless",              datetime: "Viernes 20:00 h",  poster: "/twinless.jpg", capacity: 30, reserved: 12 },
-  { id: 2, title: "The History of Sound",  datetime: "Sábado 18:00 h",   poster: "/history.jpg", capacity: 30, reserved: 29 },
-  { id: 3, title: "Sentimental Value",     datetime: "Domingo 17:00 h",  poster: "/sentimental.jpg", capacity: 25, reserved: 25 },
-  { id: 4, title: "Bugonia",               datetime: "Jueves 19:00 h",   poster: "/bugonia.jpg", capacity: 20, reserved: 3  },
-  { id: 5, title: "Marty Supreme",         datetime: "Miércoles 21:00 h",poster: "/marty.jpg", capacity: 40, reserved: 33 },
-  { id: 6, title: "The Smashing Machine",  datetime: "Lunes 17:00 h",    poster: "/smashing.jpg", capacity: 35, reserved: 0  },
-];
+import { ref, onMounted } from 'vue'
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from '../firebase'
+
+const functions = ref([])
 
 const proximosEstrenos = [
   {
@@ -28,6 +25,25 @@ const proximosEstrenos = [
     release: "Abril 2026"
   }
 ];
+
+onMounted(async () => {
+  try {
+
+    const querySnapshot = await getDocs(collection(db, 'showtimes'))
+
+    functions.value = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      capacity: 30,
+      reserved: Math.floor(Math.random() * 30)
+    }))
+
+    console.log('Funciones cargadas desde Firebase')
+
+  } catch (error) {
+    console.error('Error cargando funciones:', error)
+  }
+})
 
 
 // Reglas: soldout si reserved >= capacity; few si reserved >= 0.8 * capacity; disponible en otro caso
@@ -82,7 +98,7 @@ const shareProgram = () => {
           class="bg-dark rounded-lg p-4 shadow-sm ring-1 ring-[#2a2a2a] flex flex-col items-center"
         >
           <router-link :to="`/pelicula/${f.id}`">
-            <img :src="f.poster" :alt="f.title" class="w-full h-64 object-contain bg-black/20 rounded" />
+            <img :src="f.image" :alt="f.title" class="w-full h-64 object-contain bg-black/20 rounded" />
           </router-link>
           <router-link :to="`/pelicula/${f.id}`">
             <h3 class="mt-3 text-lg font-playfair text-center leading-snug">{{ f.title }}</h3>

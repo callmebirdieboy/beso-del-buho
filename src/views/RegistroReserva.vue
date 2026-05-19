@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { collection, addDoc } from 'firebase/firestore'
+import { db } from '../firebase'
 
 const router = useRouter()
 const route = useRoute()
@@ -45,8 +47,22 @@ const validarFormulario = () => {
 }
 
 // Enviar formulario
-const enviarFormulario = () => {
+const enviarFormulario = async () => {
   if (validarFormulario()) {
+
+  try {
+
+    await addDoc(collection(db, 'reservations'), {
+      nombre: nombre.value,
+      correo: correo.value,
+      telefono: telefono.value,
+      movieId: movieId,
+      selectedSeats: selectedSeats,
+      fecha: new Date().toISOString()
+    })
+
+    console.log('Reserva guardada en Firebase')
+
     router.push({
       name: 'confirmacion',
       query: {
@@ -57,7 +73,11 @@ const enviarFormulario = () => {
         selectedSeats: selectedSeats
       }
     })
+
+  } catch (error) {
+    console.error('Error guardando reserva:', error)
   }
+}
 }
 </script>
 

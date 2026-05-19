@@ -1,12 +1,41 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { ref } from 'vue'
-import { functions } from '../data/functions.js'
+import { onMounted } from 'vue'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '../firebase'
 
 const route = useRoute()
 const router = useRouter()
-const id = parseInt(route.params.id)
-const movie = functions.find(f => f.id === id)
+const id = route.params.id
+
+const movie = ref(null)
+
+onMounted(async () => {
+
+  try {
+
+    const docRef = doc(db, 'showtimes', id)
+    const docSnap = await getDoc(docRef)
+
+    if (docSnap.exists()) {
+
+      movie.value = {
+        id: docSnap.id,
+        ...docSnap.data()
+      }
+
+      console.log('Película cargada correctamente')
+
+    } else {
+      console.log('Película no encontrada')
+    }
+
+  } catch (error) {
+    console.error('Error cargando película:', error)
+  }
+
+})
 
 // Simulación de asientos (5x6)
 const rows = 5
@@ -49,19 +78,13 @@ const confirmSeats = () => {
     return
   }
 
-  // Obtener los asientos seleccionados (por coordenadas o número)
-  const seatsSelected = []
-  seats.value.forEach((row, r) => {
-    row.forEach((seat, c) => {
-      if (seat === 2) seatsSelected.push(`F${r + 1}A${c + 1}`)
-    })
-  })
+  const seatsSelected = selectedSeats.value
 
   // Redirigir al formulario con datos de la película y asientos
   router.push({
     name: 'registro',
     query: {
-      movieId: movie.id,
+      movieId: id,
       selectedSeats: seatsSelected.join(', ')
     }
   })
@@ -70,7 +93,9 @@ const confirmSeats = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-dark text-textMain flex flex-col items-center py-8 px-4">
+  <div
+  v-if="movie"
+  class="min-h-screen bg-dark text-textMain flex flex-col items-center py-8 px-4">
     <!-- Logo -->
     <img src="/logo.png" alt="El Beso del Búho" class="w-full max-w-sm h-auto mb-6" />
 

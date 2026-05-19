@@ -1,6 +1,8 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
-import { functions } from '../data/functions.js'
+import { ref, onMounted } from 'vue'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '../firebase'
 
 const router = useRouter()
 const route = useRoute()
@@ -10,10 +12,35 @@ const nombre = route.query.nombre || ''
 const correo = route.query.correo || ''
 const telefono = route.query.telefono || ''
 const selectedSeats = route.query.selectedSeats || ''
-const movieId = parseInt(route.query.movieId)
+const movieId = route.query.movieId
 
-// Buscar la película correspondiente
-const movie = functions.find(f => f.id === movieId)
+const movie = ref(null)
+
+onMounted(async () => {
+
+  try {
+
+    const docRef = doc(db, 'showtimes', movieId)
+    const docSnap = await getDoc(docRef)
+
+    if (docSnap.exists()) {
+
+      movie.value = {
+        id: docSnap.id,
+        ...docSnap.data()
+      }
+
+      console.log('Datos de función cargados')
+
+    } else {
+      console.log('Película no encontrada')
+    }
+
+  } catch (error) {
+    console.error('Error cargando función:', error)
+  }
+
+})
 
 // Acción: volver a la cartelera
 const volverACartelera = () => {
@@ -30,7 +57,8 @@ const volverACartelera = () => {
     </header>
 
     <!-- Contenido principal -->
-    <main class="flex-grow flex flex-col items-center justify-center px-6 text-center">
+    <main
+     v-if="movie" class="flex-grow flex flex-col items-center justify-center px-6 text-center">
       <div class="bg-[#1E1E1E] ring-1 ring-[#2a2a2a] p-6 rounded-xl max-w-md w-full">
         <p class="font-inter text-base mb-4">
           Gracias, <strong>{{ nombre || 'Visitante' }}</strong>.<br />

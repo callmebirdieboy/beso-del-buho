@@ -1,15 +1,43 @@
 <script setup>
 import { useRoute } from 'vue-router'
-import { functions } from '../data/functions.js' // 👈 importa la lista real
+import { ref, onMounted } from 'vue'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '../firebase'
 
 const route = useRoute()
-const id = parseInt(route.params.id) // id dinámico desde la URL
+const id = route.params.id
 
-// Buscar la película por id en el dataset
-const movie = functions.find(f => f.id === id)
+const movie = ref(null)
+const isSoldOut = ref(false)
 
-// Reglas de disponibilidad
-const isSoldOut = movie.reserved >= movie.capacity
+onMounted(async () => {
+
+  try {
+
+    const docRef = doc(db, 'showtimes', id)
+    const docSnap = await getDoc(docRef)
+
+    if (docSnap.exists()) {
+
+      movie.value = {
+        id: docSnap.id,
+        ...docSnap.data(),
+        capacity: 30,
+        reserved: Math.floor(Math.random() * 30)
+      }
+
+      isSoldOut.value =
+        movie.value.reserved >= movie.value.capacity
+
+    } else {
+      console.log('Película no encontrada')
+    }
+
+  } catch (error) {
+    console.error('Error obteniendo película:', error)
+  }
+
+})
 </script>
 
 <template>
@@ -29,12 +57,13 @@ const isSoldOut = movie.reserved >= movie.capacity
 
     <!-- Contenido principal -->
     <main
+      v-if="movie"
       class="flex-grow px-6 pb-10 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start"
     >
       <!-- Póster -->
       <div class="flex justify-center">
         <img
-          :src="movie.poster"
+          :src="movie.image"
           :alt="movie.title"
           class="w-full max-w-md object-contain rounded"
         />
