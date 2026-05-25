@@ -3,6 +3,8 @@ import Cartelera from '../views/Cartelera.vue'
 import DetallePelicula from '../views/DetallePelicula.vue'
 import RegistroReserva from '../views/RegistroReserva.vue'
 import ConfirmacionReserva from '../views/ConfirmacionReserva.vue'
+import AdminView from '../views/AdminView.vue'
+import ReservationsView from '../views/ReservationsView.vue'
 import { functions } from '../data/functions'
 
 const router = createRouter({
@@ -21,6 +23,18 @@ const router = createRouter({
       props: true,
       meta: { title: 'Detalle de película | El Beso del Búho' }
     },
+    {
+  path: '/reservations',
+  name: 'reservations',
+  component: ReservationsView,
+  meta: { title: 'Reservaciones | El Beso del Búho' }
+},
+    {
+  path: '/admin',
+  name: 'admin',
+  component: AdminView,
+  meta: { title: 'Panel administrativo | El Beso del Búho' }
+},
     {
   path: '/reserva/:id',
   name: 'reserva',
